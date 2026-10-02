@@ -1,0 +1,15 @@
+name: nuclei
+toolName: nuclei_scan
+executable: nuclei
+description: >-
+  Run a nuclei vulnerability scan against a URL or host and return its raw output.
+  'target' is a URL or host (space-separate several). 'options' are raw nuclei flags,
+  typically selecting templates, tags or severities. Only scan hosts the user is authorized to scan.
+targetFlag: "-u"
+defaultArguments: []
+optionExamples:
+  - "-severity critical,high"
+  - "-tags cve,rce"
+  - "-id CVE-2021-44228"
+defaultTimeoutSeconds: 600
+maxTimeoutSeconds: 3600

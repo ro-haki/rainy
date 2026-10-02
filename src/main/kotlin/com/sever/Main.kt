@@ -1,29 +1,34 @@
 package com.sever
 
 import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.tools.annotations.Tool
-import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.executor.clients.anthropic.AnthropicLLMClient
-import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
+import com.sever.config.AgentConfigLoader
+import com.sever.mcp.McpServers
+import com.sever.mcp.playwrightMcpServer
+import com.sever.tools.ScanTools
 import kotlinx.coroutines.runBlocking
 
-const val API_KEY = "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"
-const val SYSTEM_PROMPT = """
-    
-"""
-
 fun main() {
-    println("Starting...")
+    val config = AgentConfigLoader.load()
+    val mcpServers = McpServers(listOf(playwrightMcpServer()))
 
-    val agent = AIAgent(
-        promptExecutor = MultiLLMPromptExecutor(AnthropicLLMClient(API_KEY)),
-        llmModel = AnthropicModels.Haiku_4_5,
-        systemPrompt = SYSTEM_PROMPT
-    )
+    try {
+        runBlocking {
+            val toolRegistry = mcpServers.connectAll() + ScanTools.registry()
+            println("Connected. Tools: ${toolRegistry.tools.joinToString { it.name }}")
 
-    runBlocking {
-        val response = agent.run("")
-        println(response)
+            val agent = AIAgent(
+                promptExecutor = MultiLLMPromptExecutor(AnthropicLLMClient(config.apiKey)),
+                llmModel = config.model,
+                systemPrompt = config.systemPrompt,
+                toolRegistry = toolRegistry,
+            )
+
+                val response = agent.run("Run masscan scanme.nmap.org over all ports")
+            println(response)
+        }
+    } finally {
+        mcpServers.closeAll()
     }
 }

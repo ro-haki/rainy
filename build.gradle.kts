@@ -42,6 +42,9 @@ dependencies {
 
 val imageName = "rainy-agent:${project.version}"
 
+// Task prompt passed as the container command, e.g. ./gradlew devRun -Pprompt="scan example.com"
+val promptCmd = providers.gradleProperty("prompt").map { listOf(it) }.orElse(emptyList())
+
 val dockerContext by tasks.registering(Sync::class) {
     group = "docker"
     description = "Assembles the minimal Docker build context."
@@ -64,6 +67,7 @@ val createContainer by tasks.registering(DockerCreateContainer::class) {
     description = "Creates a container from the agent image."
     dependsOn(buildImage)
     targetImageId(imageName)
+    cmd.set(promptCmd)
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }
@@ -89,6 +93,7 @@ val devCreateContainer by tasks.registering(DockerCreateContainer::class) {
     description = "Creates a dev container with the freshly-built dist bind-mounted."
     dependsOn(tasks.installDist)
     targetImageId(imageName)
+    cmd.set(promptCmd)
     hostConfig.binds.set(mapOf(layout.buildDirectory.dir("install/rainy").get().asFile.absolutePath to "/app"))
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)

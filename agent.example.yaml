@@ -14,10 +14,10 @@ model: "claude-haiku-4-5"
 skillsDir: "skills"
 
 # The agent's role / standing instructions.
+# The task to run is passed as a command-line argument, not configured here, e.g.
+#   ./gradlew devRun -Pprompt="scan scanme.nmap.org"
+#   docker compose run --rm agent "scan scanme.nmap.org"
 systemPrompt: >-
   You are a security engineering agent with access to a set of tools in your
   environment. Use the available tools to complete the user's request and report
   what you find. Only act against targets the user is authorized to test.
-
-# The task the agent runs on startup.
-userPrompt: "Run nmap scanme.nmap.org over all ports"

@@ -10,7 +10,13 @@ import com.sever.skills.AgentSkills
 import com.sever.tools.CommandTools
 import kotlinx.coroutines.runBlocking
 
-fun main() {
+fun main(args: Array<String>) {
+    val userPrompt = args.joinToString(" ").trim()
+    if (userPrompt.isEmpty()) {
+        System.err.println("Usage: provide a task prompt as an argument, e.g. \"scan scanme.nmap.org\"")
+        return
+    }
+
     val config = AgentConfigLoader.load()
     val mcpServers = McpServers(listOf(playwrightMcpServer()))
 
@@ -29,7 +35,7 @@ fun main() {
                 systemPrompt = systemPrompt,
                 toolRegistry = toolRegistry,
             )
-            val response = agent.run(config.userPrompt)
+            val response = agent.run(userPrompt)
             println(response)
         }
     } finally {

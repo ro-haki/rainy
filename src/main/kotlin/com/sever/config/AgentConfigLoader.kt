@@ -7,11 +7,9 @@ import java.io.File
 
 object AgentConfigLoader {
     fun load(resourcePath: String = "/agent.yml"): AgentConfig {
-        // Prefer an on-disk agent.yml (overridable at runtime, e.g. mounted in a container),
-        // falling back to the one bundled on the classpath.
         val external = File("agent.yml")
         val raw = if (external.isFile) {
-            external.inputStream().use { Yaml().load<Map<String, Any?>>(it) }
+            external.inputStream().use { Yaml().load(it) }
         } else {
             javaClass.getResourceAsStream(resourcePath)?.use { Yaml().load<Map<String, Any?>>(it) }
                 ?: error("Agent config not found (no ./agent.yml and no classpath $resourcePath)")

@@ -45,3 +45,6 @@ bin/
 .DS_Store
 # Local secrets
 .env
+
+# Tool-call run logs
+logs/

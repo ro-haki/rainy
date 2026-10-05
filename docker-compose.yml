@@ -14,5 +14,7 @@ services:
     volumes:
       # Edit skills without rebuilding the image.
       - ./skills:/app/skills:ro
+      # Persist per-run tool-call jsonl logs on the host.
+      - ./logs:/app/logs
       # Override config without rebuilding: `cp agent.example.yaml agent.yml`, then uncomment.
       # - ./agent.yml:/app/agent.yml:ro

@@ -36,14 +36,20 @@ tasks.test {
 dependencies {
     implementation("ai.koog:koog-agents:1.3.0")
     implementation("ai.koog:koog-agents-additions:1.3.0-beta")
+    implementation("ai.koog:agents-features-event-handler:1.3.0")
     implementation("ai.koog:skills:1.3.0-beta")
     implementation("org.yaml:snakeyaml:2.3")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.16")
 }
 
 val imageName = "rainy-agent:${project.version}"
 
 // Task prompt passed as the container command, e.g. ./gradlew devRun -Pprompt="scan example.com"
 val promptCmd = providers.gradleProperty("prompt").map { listOf(it) }.orElse(emptyList())
+
+// Host logs directory bind-mounted into the containers so per-run jsonl logs persist.
+val logsDir = project.file("logs").apply { mkdirs() }.absolutePath
 
 // .env values (API key, model) injected into the containers the docker tasks run.
 val dotenv: Map<String, String> = file(".env").takeIf { it.isFile }
@@ -77,6 +83,7 @@ val createContainer by tasks.registering(DockerCreateContainer::class) {
     targetImageId(imageName)
     cmd.set(promptCmd)
     envVars.set(dotenv)
+    hostConfig.binds.set(mapOf(logsDir to "/app/logs"))
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }
@@ -104,7 +111,12 @@ val devCreateContainer by tasks.registering(DockerCreateContainer::class) {
     targetImageId(imageName)
     cmd.set(promptCmd)
     envVars.set(dotenv)
-    hostConfig.binds.set(mapOf(layout.buildDirectory.dir("install/rainy").get().asFile.absolutePath to "/app"))
+    hostConfig.binds.set(
+        mapOf(
+            layout.buildDirectory.dir("install/rainy").get().asFile.absolutePath to "/app",
+            logsDir to "/app/logs",
+        ),
+    )
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }

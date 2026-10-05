@@ -6,8 +6,8 @@ services:
     build:
       context: ./build/docker
     image: rainy-agent:1.0-SNAPSHOT
-    environment:
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in your environment or .env}
+    env_file:
+      - .env
     cap_add:
       - NET_RAW    # raw sockets for nmap/masscan/rustscan
       - NET_ADMIN

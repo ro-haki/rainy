@@ -45,6 +45,14 @@ val imageName = "rainy-agent:${project.version}"
 // Task prompt passed as the container command, e.g. ./gradlew devRun -Pprompt="scan example.com"
 val promptCmd = providers.gradleProperty("prompt").map { listOf(it) }.orElse(emptyList())
 
+// .env values (API key, model) injected into the containers the docker tasks run.
+val dotenv: Map<String, String> = file(".env").takeIf { it.isFile }
+    ?.readLines()
+    ?.map { it.trim() }
+    ?.filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+    ?.associate { it.substringBefore("=").trim() to it.substringAfter("=").trim().trim('"') }
+    ?: emptyMap()
+
 val dockerContext by tasks.registering(Sync::class) {
     group = "docker"
     description = "Assembles the minimal Docker build context."
@@ -68,6 +76,7 @@ val createContainer by tasks.registering(DockerCreateContainer::class) {
     dependsOn(buildImage)
     targetImageId(imageName)
     cmd.set(promptCmd)
+    envVars.set(dotenv)
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }
@@ -94,6 +103,7 @@ val devCreateContainer by tasks.registering(DockerCreateContainer::class) {
     dependsOn(tasks.installDist)
     targetImageId(imageName)
     cmd.set(promptCmd)
+    envVars.set(dotenv)
     hostConfig.binds.set(mapOf(layout.buildDirectory.dir("install/rainy").get().asFile.absolutePath to "/app"))
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)

@@ -17,15 +17,11 @@ object AgentConfigLoader {
                 ?: error("Agent config not found (no ./agent.yml and no classpath $resourcePath)")
         }
 
-        val apiKey = System.getenv("ANTHROPIC_API_KEY")
-            ?: raw["apiKey"] as? String
-            ?: error("Agent config missing 'apiKey' and ANTHROPIC_API_KEY is unset")
-
         return AgentConfig(
-            apiKey = apiKey,
+            apiKey = Env.require("ANTHROPIC_API_KEY"),
+            model = resolveModel(Env.require("ANTHROPIC_MODEL")),
             systemPrompt = raw["systemPrompt"] as? String ?: error("Agent config missing 'systemPrompt'"),
             skillsDir = raw["skillsDir"] as? String ?: "skills",
-            model = resolveModel(raw["model"] as? String ?: error("Agent config missing 'model'")),
         )
     }
 

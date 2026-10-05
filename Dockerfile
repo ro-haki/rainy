@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 ARG NUCLEI_VERSION=3.3.7
+ARG RUSTSCAN_VERSION=2.4.1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -22,7 +23,15 @@ RUN curl -fsSL -o /tmp/nuclei.zip \
     && rm /tmp/nuclei.zip \
     && nuclei -update-templates
 
+RUN curl -fsSL -o /tmp/rustscan.deb.zip \
+        "https://github.com/RustScan/RustScan/releases/download/${RUSTSCAN_VERSION}/rustscan.deb.zip" \
+    && unzip -o /tmp/rustscan.deb.zip -d /tmp/rustscan \
+    && apt-get update \
+    && apt-get install -y /tmp/rustscan/*.deb \
+    && rm -rf /tmp/rustscan /tmp/rustscan.deb.zip /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY app/ ./
+COPY skills/ ./skills/
 
 ENTRYPOINT ["./bin/rainy"]

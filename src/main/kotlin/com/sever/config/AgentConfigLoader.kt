@@ -16,6 +16,8 @@ object AgentConfigLoader {
         return AgentConfig(
             apiKey = apiKey,
             systemPrompt = raw["systemPrompt"] as? String ?: error("Agent config missing 'systemPrompt'"),
+            userPrompt = raw["userPrompt"] as? String ?: error("Agent config missing 'userPrompt'"),
+            skillsDir = raw["skillsDir"] as? String ?: "skills",
             model = resolveModel(raw["model"] as? String ?: error("Agent config missing 'model'")),
         )
     }

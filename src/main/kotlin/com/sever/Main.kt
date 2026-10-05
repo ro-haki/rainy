@@ -6,7 +6,8 @@ import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
 import com.sever.config.AgentConfigLoader
 import com.sever.mcp.McpServers
 import com.sever.mcp.playwrightMcpServer
-import com.sever.tools.ScanTools
+import com.sever.skills.AgentSkills
+import com.sever.tools.CommandTools
 import kotlinx.coroutines.runBlocking
 
 fun main() {
@@ -15,17 +16,20 @@ fun main() {
 
     try {
         runBlocking {
-            val toolRegistry = mcpServers.connectAll() + ScanTools.registry()
-            println("Connected. Tools: ${toolRegistry.tools.joinToString { it.name }}")
+            val toolRegistry = mcpServers.connectAll() + CommandTools.registry()
+            val systemPrompt = buildString {
+                append(config.systemPrompt)
+                append("\n\n# Available skills\n")
+                append(AgentSkills.promptSection(config.skillsDir))
+            }
 
             val agent = AIAgent(
                 promptExecutor = MultiLLMPromptExecutor(AnthropicLLMClient(config.apiKey)),
                 llmModel = config.model,
-                systemPrompt = config.systemPrompt,
+                systemPrompt = systemPrompt,
                 toolRegistry = toolRegistry,
             )
-
-                val response = agent.run("Run masscan scanme.nmap.org over all ports")
+            val response = agent.run(config.userPrompt)
             println(response)
         }
     } finally {

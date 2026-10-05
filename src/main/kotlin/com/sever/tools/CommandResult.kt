@@ -1,6 +1,6 @@
 package com.sever.tools
 
-data class ScanResult(
+data class CommandResult(
     val command: List<String>,
     val exitCode: Int?,
     val output: String,

@@ -3,10 +3,11 @@ toolName: nmap_scan
 executable: nmap
 description: >-
   Run an nmap scan and return its raw output. 'target' is a host, IP, hostname or CIDR
-  (space-separate several). 'options' are raw nmap flags, e.g. '-sV -p 1-1000'.
+  (space-separate several). 'arguments' are raw nmap flags, e.g. '-sV -p 1-1000'.
   Only scan hosts the user is authorized to scan.
+targetFlag: ""
 defaultArguments: []
-optionExamples:
+argumentExamples:
   - "-sV -p 1-1000"
   - "-A -T4 -Pn"
   - "-p- -sS"

@@ -3,10 +3,11 @@ toolName: masscan_scan
 executable: masscan
 description: >-
   Run a masscan scan (fast port scanner) and return its raw output. 'target' is an IP or CIDR
-  (space-separate several). 'options' are raw masscan flags and MUST include a port spec,
+  (space-separate several). 'arguments' are raw masscan flags and MUST include a port spec,
   e.g. '-p80,443' or '-p0-65535 --rate 10000'. Only scan hosts the user is authorized to scan.
+targetFlag: ""
 defaultArguments: []
-optionExamples:
+argumentExamples:
   - "-p80,443 --rate 1000"
   - "-p0-65535 --rate 10000"
   - "-p U:53,T:1-1000 --rate 2000"

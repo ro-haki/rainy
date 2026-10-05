@@ -1,26 +1,25 @@
 package com.sever.tools
 
-interface Scanner {
+interface Command {
     val name: String
-    fun scan(target: String, options: String, timeoutSeconds: Long): ScanResult
+    fun run(target: String, arguments: String, timeoutSeconds: Long): CommandResult
 }
 
-class CommandLineScanner(
+class CliCommand(
     override val name: String,
     private val executable: String,
     private val runner: CommandRunner,
     private val defaultArguments: List<String> = emptyList(),
     private val targetFlag: String = "",
-) : Scanner {
-    override fun scan(target: String, options: String, timeoutSeconds: Long): ScanResult {
+) : Command {
+    override fun run(target: String, arguments: String, timeoutSeconds: Long): CommandResult {
         val targets = target.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
-        require(targets.isNotEmpty()) { "target must not be empty" }
 
-        // argv list, never a shell string, so options can't inject extra commands.
+        // argv list, never a shell string, so arguments can't inject extra commands.
         val command = buildList {
             add(executable)
             addAll(defaultArguments)
-            addAll(ArgumentTokenizer.tokenize(options))
+            addAll(ArgumentTokenizer.tokenize(arguments))
             targets.forEach { t ->
                 if (targetFlag.isEmpty()) add(t) else { add(targetFlag); add(t) }
             }

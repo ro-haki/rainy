@@ -4,11 +4,11 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 interface CommandRunner {
-    fun run(command: List<String>, timeoutSeconds: Long): ScanResult
+    fun run(command: List<String>, timeoutSeconds: Long): CommandResult
 }
 
 class ProcessCommandRunner : CommandRunner {
-    override fun run(command: List<String>, timeoutSeconds: Long): ScanResult {
+    override fun run(command: List<String>, timeoutSeconds: Long): CommandResult {
         val process = ProcessBuilder(command)
             .redirectErrorStream(true)
             .start()
@@ -22,7 +22,7 @@ class ProcessCommandRunner : CommandRunner {
         if (!finished) process.destroyForcibly()
 
         val captured = runCatching { output.get(5, TimeUnit.SECONDS) }.getOrDefault("")
-        return ScanResult(
+        return CommandResult(
             command = command,
             exitCode = if (finished) process.exitValue() else null,
             output = captured,

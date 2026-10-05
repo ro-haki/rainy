@@ -36,6 +36,7 @@ tasks.test {
 dependencies {
     implementation("ai.koog:koog-agents:1.3.0")
     implementation("ai.koog:koog-agents-additions:1.3.0-beta")
+    implementation("ai.koog:skills:1.3.0-beta")
     implementation("org.yaml:snakeyaml:2.3")
 }
 
@@ -45,6 +46,7 @@ val dockerContext by tasks.registering(Sync::class) {
     group = "docker"
     description = "Assembles the minimal Docker build context."
     from(tasks.installDist) { into("app") }
+    from("skills") { into("skills") }
     from("Dockerfile")
     into(layout.buildDirectory.dir("docker"))
 }

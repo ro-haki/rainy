@@ -25,4 +25,6 @@ Goal: enumerate open ports and their services on a target the user is authorized
 ## Rules
 
 - Prefer rustscan/masscan for breadth and nmap for depth.
+- Do not run `nmap` if rustscan/masscan responds that all ports are open
+  - It means that port spoofer in place
 - Never scan hosts outside the authorized scope.

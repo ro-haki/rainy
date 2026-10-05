@@ -2,14 +2,33 @@ name: nuclei
 toolName: nuclei_scan
 executable: nuclei
 description: >-
-  Run a nuclei vulnerability scan against a URL or host and return its raw output.
-  'target' is a URL or host (space-separate several). 'arguments' are raw nuclei flags,
-  typically selecting templates, tags or severities. Only scan hosts the user is authorized to scan.
+  Run a nuclei vulnerability scan against a URL or host and return its raw output. 'target' is a
+  URL or host (space-separate several). 'arguments' are raw nuclei flags, typically selecting
+  templates, tags or severities. Only scan hosts the user is authorized to scan.
 targetFlag: "-u"
 defaultArguments: []
-argumentExamples:
-  - "-severity critical,high"
-  - "-tags cve,rce"
-  - "-id CVE-2021-44228"
+# Rate control via nuclei request rate-limit (-rl) and concurrency (-c).
+modes:
+  slow: ["-rl", "50", "-c", "10"]
+  normal: ["-rl", "150", "-c", "25"]
+  fast: ["-rl", "500", "-c", "50"]
+defaultMode: normal
+examples:
+  - arguments: "-severity critical,high"
+    description: "Only run templates rated critical or high"
+  - arguments: "-tags cve"
+    description: "Run every CVE-tagged template"
+  - arguments: "-tags rce,sqli"
+    description: "Focus on remote-code-execution and SQL-injection templates"
+  - arguments: "-id CVE-2021-44228"
+    description: "Run a single template by ID (here, Log4Shell)"
+  - arguments: "-t http/technologies/"
+    description: "Run the templates in a directory to fingerprint web technologies"
+  - arguments: "-as"
+    description: "Automatic scan: pick templates based on detected technologies"
+  - arguments: "-silent"
+    description: "Suppress banner and logs; print only findings"
+  - arguments: "-tags exposure,config"
+    description: "Look for exposed files and misconfigurations"
 defaultTimeoutSeconds: 600
 maxTimeoutSeconds: 3600

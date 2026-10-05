@@ -3,13 +3,36 @@ toolName: nmap_scan
 executable: nmap
 description: >-
   Run an nmap scan and return its raw output. 'target' is a host, IP, hostname or CIDR
-  (space-separate several). 'arguments' are raw nmap flags, e.g. '-sV -p 1-1000'.
-  Only scan hosts the user is authorized to scan.
+  (space-separate several). 'arguments' are raw nmap flags. Only scan hosts the user is
+  authorized to scan.
 targetFlag: ""
 defaultArguments: []
-argumentExamples:
-  - "-sV -p 1-1000"
-  - "-A -T4 -Pn"
-  - "-p- -sS"
+# Rate control via nmap timing templates (-T2 polite ... -T4 aggressive).
+modes:
+  slow: ["-T2"]
+  normal: ["-T3"]
+  fast: ["-T4"]
+defaultMode: normal
+examples:
+  - arguments: "-sV"
+    description: "Detect the service and version behind each open port"
+  - arguments: "-p 1-65535"
+    description: "Scan the full TCP port range (all 65535 ports)"
+  - arguments: "-sS -p 22,80,443"
+    description: "Stealth SYN scan of specific ports (needs raw-socket/root)"
+  - arguments: "-sU -p 53,161"
+    description: "UDP scan of DNS (53) and SNMP (161)"
+  - arguments: "-A"
+    description: "Aggressive: OS detection, version detection, default scripts and traceroute"
+  - arguments: "-sC -sV"
+    description: "Run the default NSE script set plus version detection"
+  - arguments: "-Pn"
+    description: "Skip host discovery; treat the target as up (bypasses ping filtering)"
+  - arguments: "--script vuln"
+    description: "Run the 'vuln' NSE category to probe for known vulnerabilities"
+  - arguments: "-O"
+    description: "Fingerprint the operating system"
+  - arguments: "-sV --version-intensity 9"
+    description: "Maximum-effort version detection on open ports"
 defaultTimeoutSeconds: 300
 maxTimeoutSeconds: 3600

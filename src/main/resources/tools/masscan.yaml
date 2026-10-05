@@ -2,14 +2,31 @@ name: masscan
 toolName: masscan_scan
 executable: masscan
 description: >-
-  Run a masscan scan (fast port scanner) and return its raw output. 'target' is an IP or CIDR
-  (space-separate several). 'arguments' are raw masscan flags and MUST include a port spec,
-  e.g. '-p80,443' or '-p0-65535 --rate 10000'. Only scan hosts the user is authorized to scan.
+  Run a masscan scan (fast Internet-scale port scanner) and return its raw output. 'target' is
+  an IP or CIDR (space-separate several). 'arguments' are raw masscan flags and MUST include a
+  port spec. Only scan hosts the user is authorized to scan.
 targetFlag: ""
 defaultArguments: []
-argumentExamples:
-  - "-p80,443 --rate 1000"
-  - "-p0-65535 --rate 10000"
-  - "-p U:53,T:1-1000 --rate 2000"
+# Rate control via masscan's packets-per-second rate.
+modes:
+  slow: ["--rate", "100"]
+  normal: ["--rate", "1000"]
+  fast: ["--rate", "10000"]
+defaultMode: normal
+examples:
+  - arguments: "-p80,443"
+    description: "Scan the HTTP and HTTPS ports"
+  - arguments: "-p0-65535"
+    description: "Scan the entire TCP port range"
+  - arguments: "-p U:53,U:161"
+    description: "UDP scan of DNS (53) and SNMP (161)"
+  - arguments: "-p1-1000 --banners"
+    description: "Scan low ports and grab service banners"
+  - arguments: "-p80 --open-only"
+    description: "Report only hosts that have port 80 open"
+  - arguments: "-p443 -oG -"
+    description: "Scan HTTPS and emit greppable output to stdout"
+  - arguments: "-p0-65535 --exclude 10.0.0.1"
+    description: "Full-range scan while excluding a specific host"
 defaultTimeoutSeconds: 300
 maxTimeoutSeconds: 3600

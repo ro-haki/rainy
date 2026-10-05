@@ -4,15 +4,30 @@ executable: rustscan
 description: >-
   Run rustscan, a very fast port scanner, and return its raw output. 'target' is a host, IP or
   CIDR (space-separate several). 'arguments' are raw rustscan flags; use '-g' for greppable
-  open-ports-only output, or append '-- <nmap args>' to pipe results into nmap.
-  Only scan hosts the user is authorized to scan.
+  open-ports-only output, or append '-- <nmap args>' to pipe results into nmap. Only scan hosts
+  the user is authorized to scan.
 targetFlag: "-a"
 defaultArguments:
   - "--ulimit"
   - "5000"
-argumentExamples:
-  - "-g"
-  - "-r 1-65535 -g"
-  - "--range 1-1000 -- -sV"
+# Rate control via rustscan's batch size (ports probed in parallel).
+modes:
+  slow: ["-b", "500"]
+  normal: ["-b", "4500"]
+  fast: ["-b", "10000"]
+defaultMode: normal
+examples:
+  - arguments: "-g"
+    description: "Greppable output: list only the open ports and do NOT auto-run nmap"
+  - arguments: "-r 1-65535 -g"
+    description: "Scan the full port range, greppable open-ports output"
+  - arguments: "-p 22,80,443 -g"
+    description: "Check a specific set of ports"
+  - arguments: "--range 1-1000 -- -sV"
+    description: "Scan low ports, then pipe the open ones into 'nmap -sV'"
+  - arguments: "--top -g"
+    description: "Scan only the most common ports"
+  - arguments: "-g --timeout 2000"
+    description: "Greppable scan with a longer per-port timeout for slow/filtered hosts"
 defaultTimeoutSeconds: 300
 maxTimeoutSeconds: 3600

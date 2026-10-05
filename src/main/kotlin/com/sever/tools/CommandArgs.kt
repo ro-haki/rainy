@@ -9,6 +9,8 @@ data class CommandArgs(
     val target: String = "",
     @property:LLMDescription("Command-line flags/arguments; see the tool description for examples. May be empty.")
     val arguments: String = "",
+    @property:LLMDescription("Rate/intensity mode: 'slow', 'normal' or 'fast'. Omit to use the tool default.")
+    val mode: String? = null,
     @property:LLMDescription("Max seconds before the command is killed; omit to use the tool default.")
     val timeoutSeconds: Long? = null,
 )

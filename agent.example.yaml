@@ -1,0 +1,23 @@
+# Copy to ./agent.yml (or mount it at /app/agent.yml in the container) to override the
+# bundled config without rebuilding. An on-disk agent.yml takes precedence over the one
+# baked into the jar.
+
+# Anthropic model id. Must be one Koog knows (e.g. claude-haiku-4-5, claude-sonnet-5,
+# claude-opus-4-6). An unknown id fails at startup with the list of valid ids.
+model: "claude-haiku-4-5"
+
+# apiKey is read from the ANTHROPIC_API_KEY environment variable by default.
+# You may instead set it here, but prefer the env var so the key stays out of the repo.
+# apiKey: "sk-ant-..."
+
+# Directory containing skill folders (each with a SKILL.md). Relative to the working dir.
+skillsDir: "skills"
+
+# The agent's role / standing instructions.
+systemPrompt: >-
+  You are a security engineering agent with access to a set of tools in your
+  environment. Use the available tools to complete the user's request and report
+  what you find. Only act against targets the user is authorized to test.
+
+# The task the agent runs on startup.
+userPrompt: "Run nmap scanme.nmap.org over all ports"

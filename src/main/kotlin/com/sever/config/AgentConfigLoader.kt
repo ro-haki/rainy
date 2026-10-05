@@ -3,11 +3,19 @@ package com.sever.config
 import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.llm.LLModel
 import org.yaml.snakeyaml.Yaml
+import java.io.File
 
 object AgentConfigLoader {
     fun load(resourcePath: String = "/agent.yml"): AgentConfig {
-        val raw = javaClass.getResourceAsStream(resourcePath)?.use { Yaml().load<Map<String, Any?>>(it) }
-            ?: error("Agent config not found on classpath: $resourcePath")
+        // Prefer an on-disk agent.yml (overridable at runtime, e.g. mounted in a container),
+        // falling back to the one bundled on the classpath.
+        val external = File("agent.yml")
+        val raw = if (external.isFile) {
+            external.inputStream().use { Yaml().load<Map<String, Any?>>(it) }
+        } else {
+            javaClass.getResourceAsStream(resourcePath)?.use { Yaml().load<Map<String, Any?>>(it) }
+                ?: error("Agent config not found (no ./agent.yml and no classpath $resourcePath)")
+        }
 
         val apiKey = System.getenv("ANTHROPIC_API_KEY")
             ?: raw["apiKey"] as? String

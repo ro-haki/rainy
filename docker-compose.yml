@@ -1,0 +1,18 @@
+services:
+  agent:
+    # The Dockerfile builds from the Gradle-staged context, so run
+    #   ./gradlew dockerContext      (or: ./gradlew buildImage)
+    # before `docker compose up --build`.
+    build:
+      context: ./build/docker
+    image: rainy-agent:1.0-SNAPSHOT
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in your environment or .env}
+    cap_add:
+      - NET_RAW    # raw sockets for nmap/masscan/rustscan
+      - NET_ADMIN
+    volumes:
+      # Edit skills without rebuilding the image.
+      - ./skills:/app/skills:ro
+      # Override config without rebuilding: `cp agent.example.yaml agent.yml`, then uncomment.
+      # - ./agent.yml:/app/agent.yml:ro

@@ -4,6 +4,7 @@ import com.sever.config.AgentConfig
 import com.sever.config.AgentConfigLoader
 import com.sever.mcp.McpServers
 import com.sever.mcp.playwrightMcpServer
+import com.sever.skills.SkillTools
 import com.sever.tools.CommandTools
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
@@ -18,7 +19,7 @@ class Agent(
     fun run(userPrompt: String): String = runBlocking {
         log.info("Starting agent with model {}", config.model.id)
         try {
-            val toolRegistry = mcpServers.connectAll() + CommandTools.registry()
+            val toolRegistry = mcpServers.connectAll() + CommandTools.registry() + SkillTools.registry(config.skillsDir)
             log.info("Tools available: {}", toolRegistry.tools.joinToString { it.name })
 
             val agent = agentFactory.create(SystemPromptFactory.build(config), toolRegistry)

@@ -9,6 +9,7 @@ object SystemPromptFactory {
         val skills = AgentSkills.promptSection(config.skillsDir)
         if (skills.isNotBlank()) {
             append("\n\n# Available skills\n")
+            append("Call the `load_skill` tool with a skill's name to get its full playbook, then follow it.\n\n")
             append(skills)
         }
     }

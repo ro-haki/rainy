@@ -33,7 +33,7 @@ object CommandToolFactory {
                 maxTimeoutSeconds = config.maxTimeoutSeconds,
             ),
         )
-        return CommandTool(config.toolName, describe(config), service)
+        return CommandTool(config.name, describe(config), service)
     }
 
     private fun describe(config: ToolConfig): String = buildString {

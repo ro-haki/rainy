@@ -1,0 +1,18 @@
+name: alterx
+executable: alterx
+description: >-
+  Run alterx to generate subdomain permutations/mutations from a seed list using its default
+  patterns. Supply the already-discovered subdomains (newline-separated) as the tool input; alterx
+  prints candidate subdomains to enumerate. Resolve the output with dnsx to find live ones.
+  'target' is unused — pass the subdomains via input. Only assess domains the user is authorized to.
+targetFlag: ""
+defaultArguments: []
+examples:
+  - arguments: "-enrich"
+    description: "Enrich the permutation patterns with words extracted from the input hosts"
+  - arguments: "-p '{{word}}-{{suffix}}'"
+    description: "Generate from a custom pattern"
+  - arguments: "-limit 50000"
+    description: "Cap the number of generated candidates"
+defaultTimeoutSeconds: 120
+maxTimeoutSeconds: 600

@@ -1,0 +1,17 @@
+name: waybackurls
+executable: waybackurls
+description: >-
+  Run waybackurls to fetch URLs the Wayback Machine knows for a domain (subdomains included by
+  default). 'target' is a domain. The returned URLs serve two purposes: extract the hostnames to
+  discover subdomains, and extract the paths, files, endpoints and query parameters for
+  content/directory enumeration (surfacing historical or unlinked pages). Only query domains the
+  user is authorized to assess.
+targetFlag: ""
+defaultArguments: []
+examples:
+  - arguments: "--no-subs"
+    description: "Return URLs for the exact domain only, excluding subdomains"
+  - arguments: "--dates"
+    description: "Prefix each URL with the timestamp Wayback recorded it"
+defaultTimeoutSeconds: 600
+maxTimeoutSeconds: 3600

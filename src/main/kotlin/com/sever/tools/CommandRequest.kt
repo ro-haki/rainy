@@ -4,6 +4,7 @@ data class CommandRequest(
     val target: String,
     val arguments: String,
     val modeArguments: List<String>,
+    val input: String?,
     val timeoutSeconds: Long,
 )
 
@@ -20,6 +21,7 @@ class CommandRequestParser(
             target = args.target.trim(),
             arguments = args.arguments,
             modeArguments = modes[selectedMode].orEmpty(),
+            input = args.input,
             timeoutSeconds = resolvedTimeout,
         )
     }

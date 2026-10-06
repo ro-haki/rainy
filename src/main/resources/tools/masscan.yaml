@@ -1,5 +1,4 @@
 name: masscan
-toolName: masscan_scan
 executable: masscan
 description: >-
   Run a masscan scan (fast Internet-scale port scanner) and return its raw output. 'target' is

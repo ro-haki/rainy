@@ -1,5 +1,4 @@
 name: rustscan
-toolName: rustscan_scan
 executable: rustscan
 description: >-
   Run rustscan, a very fast port scanner, and return its raw output. 'target' is a host, IP or

@@ -1,0 +1,31 @@
+name: subfinder
+executable: subfinder
+description: >-
+  Run subfinder for passive subdomain enumeration and return the discovered subdomains.
+  'target' is a domain (space-separate several). 'arguments' are raw subfinder flags.
+  Passive only — it queries public sources and does not touch the target directly.
+  Only enumerate domains the user is authorized to assess.
+targetFlag: "-d"
+defaultArguments:
+  - "-silent"
+# Rate control via subfinder's HTTP rate limit (requests per second).
+modes:
+  slow: ["-rl", "10"]
+  normal: ["-rl", "50"]
+  fast: ["-rl", "150"]
+defaultMode: normal
+examples:
+  - arguments: "-all"
+    description: "Use every available passive source (slower, more thorough)"
+  - arguments: "-recursive"
+    description: "Recursively enumerate subdomains of discovered subdomains"
+  - arguments: "-sources crtsh,virustotal"
+    description: "Query only the named sources"
+  - arguments: "-nW"
+    description: "Drop wildcard subdomains from the results"
+  - arguments: "-cs"
+    description: "Include, per subdomain, which source(s) reported it"
+  - arguments: "-oJ"
+    description: "Emit results as JSON lines"
+defaultTimeoutSeconds: 300
+maxTimeoutSeconds: 3600

@@ -7,7 +7,6 @@ data class ArgumentExample(
 
 data class ToolConfig(
     val name: String,
-    val toolName: String,
     val description: String,
     val executable: String,
     val targetFlag: String,

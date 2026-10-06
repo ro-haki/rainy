@@ -1,5 +1,4 @@
 name: nuclei
-toolName: nuclei_scan
 executable: nuclei
 description: >-
   Run a nuclei vulnerability scan against a URL or host and return its raw output. 'target' is a

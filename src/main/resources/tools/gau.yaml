@@ -1,0 +1,22 @@
+name: gau
+executable: gau
+description: >-
+  Run gau (getallurls) to fetch known URLs for a domain from the Wayback Machine, Common Crawl,
+  OTX and URLScan. 'target' is a domain. The returned URLs serve two purposes: extract the
+  hostnames to discover subdomains, and extract the paths, files, endpoints and query parameters
+  for content/directory enumeration (surfacing historical or unlinked pages). Only query domains
+  the user is authorized to assess.
+targetFlag: ""
+defaultArguments:
+  - "--subs"
+examples:
+  - arguments: "--providers wayback,commoncrawl,otx"
+    description: "Use only the named URL sources"
+  - arguments: "--blacklist png,jpg,gif,css,js,woff"
+    description: "Skip static-asset URLs"
+  - arguments: "--from 202301 --to 202412"
+    description: "Restrict to URLs seen in a date range (YYYYMM)"
+  - arguments: "--threads 5"
+    description: "Lower concurrency for a gentler run"
+defaultTimeoutSeconds: 600
+maxTimeoutSeconds: 3600

@@ -36,7 +36,6 @@ object ToolConfigLoader {
 
         return ToolConfig(
             name = raw.str("name"),
-            toolName = raw.str("toolName"),
             description = raw.str("description"),
             executable = raw.str("executable"),
             targetFlag = raw["targetFlag"] as? String ?: "",

@@ -1,0 +1,30 @@
+name: dnsx
+executable: dnsx
+description: >-
+  Run dnsx, a fast DNS toolkit, and return its output. 'target' is a domain. 'arguments' are raw
+  dnsx flags selecting record types, brute force (with a wordlist), or reverse PTR lookups.
+  Only probe domains the user is authorized to assess.
+targetFlag: "-d"
+defaultArguments:
+  - "-silent"
+# Rate control via dnsx's DNS query rate limit (queries per second).
+modes:
+  slow: ["-rl", "50"]
+  normal: ["-rl", "200"]
+  fast: ["-rl", "1000"]
+defaultMode: normal
+examples:
+  - arguments: "-a -resp"
+    description: "Resolve A records and show the responses"
+  - arguments: "-a -aaaa -cname -ns -mx -txt -soa -resp"
+    description: "Query every common record type for the domain"
+  - arguments: "-w /wordlists/subdomains.txt -a"
+    description: "Brute-force subdomains from a wordlist and keep the ones that resolve"
+  - arguments: "-cname -resp-only"
+    description: "Show only CNAME targets (useful for spotting dangling records)"
+  - arguments: "-ptr -resp-only"
+    description: "Reverse PTR lookups"
+  - arguments: "-wd example.com -a"
+    description: "Filter wildcard-DNS responses for the given root domain"
+defaultTimeoutSeconds: 300
+maxTimeoutSeconds: 3600

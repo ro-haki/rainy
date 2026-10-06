@@ -25,6 +25,6 @@ class CliCommand(
                 if (targetFlag.isEmpty()) add(target) else { add(targetFlag); add(target) }
             }
         }
-        return runner.run(command, request.timeoutSeconds)
+        return runner.run(command, request.timeoutSeconds, request.input)
     }
 }

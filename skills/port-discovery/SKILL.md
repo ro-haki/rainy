@@ -14,10 +14,10 @@ Goal: enumerate open ports and their services on a target the user is authorized
 
 ## Steps
 
-1. **Fast sweep** — find open ports across the full range quickly with `rustscan_scan`
-   (preferred) or `masscan_scan`.
-   Example: `rustscan_scan` with `target=<host>`, `arguments="-r 1-65535 -g"`.
-2. **Service/version detection** — run `nmap_scan` against **only** the ports found in step 1.
+1. **Fast sweep** — find open ports across the full range quickly with `rustscan`
+   (preferred) or `masscan`.
+   Example: `rustscan` with `target=<host>`, `arguments="-r 1-65535 -g"`.
+2. **Service/version detection** — run `nmap` against **only** the ports found in step 1.
    Example: `arguments="-sV -sC -p <comma-separated-open-ports>"`. Do not re-scan all 65535 ports with nmap.
 3. **Report** — list each open port with protocol, service and version, and call out anything
    unusual (unexpected services, outdated versions, exposed admin interfaces).

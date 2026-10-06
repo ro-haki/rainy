@@ -1,14 +1,15 @@
 package com.sever.agent
 
 import com.sever.config.AgentConfig
+import com.sever.config.AgentConfigLoader
 import com.sever.mcp.McpServers
 import com.sever.mcp.playwrightMcpServer
 import com.sever.tools.CommandTools
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
-class SecurityAgent(
-    private val config: AgentConfig,
+class Agent(
+    private val config: AgentConfig = AgentConfigLoader.load(),
     private val mcpServers: McpServers = McpServers(listOf(playwrightMcpServer())),
     private val agentFactory: AgentFactory = AgentFactory(config),
 ) {

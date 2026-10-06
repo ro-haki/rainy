@@ -39,6 +39,7 @@ dependencies {
     implementation("ai.koog:agents-features-event-handler:1.3.0")
     implementation("ai.koog:skills:1.3.0-beta")
     implementation("org.yaml:snakeyaml:2.3")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("org.slf4j:slf4j-api:2.0.17")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.16")
 }

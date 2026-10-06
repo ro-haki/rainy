@@ -2,7 +2,7 @@ package com.sever.tools
 
 interface Command {
     val name: String
-    fun run(target: String, arguments: String, modeArguments: List<String>, timeoutSeconds: Long): CommandResult
+    fun run(request: CommandRequest): CommandResult
 }
 
 class CliCommand(
@@ -12,19 +12,19 @@ class CliCommand(
     private val defaultArguments: List<String> = emptyList(),
     private val targetFlag: String = "",
 ) : Command {
-    override fun run(target: String, arguments: String, modeArguments: List<String>, timeoutSeconds: Long): CommandResult {
-        val targets = target.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    override fun run(request: CommandRequest): CommandResult {
+        val targets = request.target.split(Regex("\\s+")).filter { it.isNotBlank() }
 
         // argv list, never a shell string, so arguments can't inject extra commands.
         val command = buildList {
             add(executable)
             addAll(defaultArguments)
-            addAll(modeArguments)
-            addAll(ArgumentTokenizer.tokenize(arguments))
-            targets.forEach { t ->
-                if (targetFlag.isEmpty()) add(t) else { add(targetFlag); add(t) }
+            addAll(request.modeArguments)
+            addAll(ArgumentTokenizer.tokenize(request.arguments))
+            targets.forEach { target ->
+                if (targetFlag.isEmpty()) add(target) else { add(targetFlag); add(target) }
             }
         }
-        return runner.run(command, timeoutSeconds)
+        return runner.run(command, request.timeoutSeconds)
     }
 }

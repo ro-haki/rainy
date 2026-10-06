@@ -1,7 +1,6 @@
 package com.sever
 
-import com.sever.agent.SecurityAgent
-import com.sever.config.AgentConfigLoader
+import com.sever.agent.Agent
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("com.sever.Main")
@@ -13,7 +12,6 @@ fun main(args: Array<String>) {
         return
     }
 
-    val config = AgentConfigLoader.load()
-    val response = SecurityAgent(config).run(userPrompt)
+    val response = Agent().run(userPrompt)
     log.info("Agent response:\n{}", response)
 }

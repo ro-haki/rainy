@@ -13,12 +13,12 @@ class CommandRequestParser(
     private val defaultTimeoutSeconds: Long,
     private val maxTimeoutSeconds: Long,
 ) {
-    fun parse(target: String, arguments: String, mode: String?, timeoutSeconds: Long?): CommandRequest {
-        val selectedMode = mode?.lowercase()?.takeIf { it in modes } ?: defaultMode
-        val resolvedTimeout = (timeoutSeconds ?: defaultTimeoutSeconds).coerceIn(1, maxTimeoutSeconds)
+    fun parse(args: CommandArgs): CommandRequest {
+        val selectedMode = args.mode?.lowercase()?.takeIf { it in modes } ?: defaultMode
+        val resolvedTimeout = (args.timeoutSeconds ?: defaultTimeoutSeconds).coerceIn(1, maxTimeoutSeconds)
         return CommandRequest(
-            target = target.trim(),
-            arguments = arguments,
+            target = args.target.trim(),
+            arguments = args.arguments,
             modeArguments = modes[selectedMode].orEmpty(),
             timeoutSeconds = resolvedTimeout,
         )

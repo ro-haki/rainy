@@ -1,6 +1,7 @@
 package com.sever.observability
 
 import ai.koog.agents.core.feature.handler.tool.ToolCallCompletedContext
+import ai.koog.agents.core.feature.handler.tool.ToolCallEventContext
 import ai.koog.agents.core.feature.handler.tool.ToolCallFailedContext
 import ai.koog.agents.core.feature.handler.tool.ToolCallStartingContext
 import ai.koog.serialization.kotlinx.toKotlinxJsonElement
@@ -22,26 +23,26 @@ class ToolCallLogger {
     }
 
     fun starting(e: ToolCallStartingContext) =
-        write("tool_call", e.toolName, e.toolCallId) { put("args", e.toolArgs.toKotlinxJsonElement()) }
+        write("tool_call", e) { put("args", e.toolArgs.toKotlinxJsonElement()) }
 
     fun completed(e: ToolCallCompletedContext) =
-        write("tool_result", e.toolName, e.toolCallId) {
+        write("tool_result", e) {
             put("args", e.toolArgs.toKotlinxJsonElement())
             put("result", e.toolResult?.toKotlinxJsonElement() ?: JsonNull)
         }
 
     fun failed(e: ToolCallFailedContext) =
-        write("tool_error", e.toolName, e.toolCallId) {
+        write("tool_error", e) {
             put("args", e.toolArgs.toKotlinxJsonElement())
             put("error", e.message)
         }
 
-    private fun write(event: String, tool: String, callId: String?, extra: JsonObjectBuilder.() -> Unit) {
+    private fun write(event: String, context: ToolCallEventContext, extra: JsonObjectBuilder.() -> Unit) {
         val line = buildJsonObject {
             put("ts", Instant.now().toString())
             put("event", event)
-            put("tool", tool)
-            put("toolCallId", callId)
+            put("tool", context.toolName)
+            put("toolCallId", context.toolCallId)
             extra()
         }.toString()
         println(line)

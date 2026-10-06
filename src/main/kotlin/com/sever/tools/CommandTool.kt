@@ -10,8 +10,7 @@ class CommandTool(
     description: String,
     private val service: CommandService,
 ) : SimpleTool<CommandArgs>(typeToken<CommandArgs>(), name, description) {
-    override suspend fun execute(args: CommandArgs): String =
-        service.run(args.target, args.arguments, args.mode, args.timeoutSeconds)
+    override suspend fun execute(args: CommandArgs): String = service.run(args)
 }
 
 object CommandToolFactory {

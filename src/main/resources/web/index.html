@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>rainy agent</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 10px 16px; border-bottom: 1px solid #8884; font-weight: 600; }
+    #log { flex: 1; overflow: auto; padding: 16px; }
+    .event { margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; border: 1px solid #8883; }
+    .user_prompt { background: #3b82f61a; }
+    .agent_response { background: #22c55e1a; }
+    .tool_call { background: #f59e0b1a; }
+    .tool_result, .tool_error { background: #8882; }
+    .tool_error, .error { border-color: #ef4444; }
+    .error { background: #ef44441a; }
+    .tag { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; opacity: .7; margin-bottom: 4px; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; tab-size: 4; font: 13px/1.45 ui-monospace, monospace; }
+    form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #8884; }
+    input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #8886; background: transparent; color: inherit; }
+    button { padding: 10px 16px; border-radius: 8px; border: 0; background: #3b82f6; color: #fff; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: default; }
+  </style>
+</head>
+<body>
+  <header>rainy agent</header>
+  <div id="log"></div>
+  <form id="form">
+    <input id="msg" placeholder="Ask the agent to scan, enumerate, …" autocomplete="off" />
+    <button id="send" type="submit">Send</button>
+  </form>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const form = document.getElementById("form");
+    const msgEl = document.getElementById("msg");
+    const sendBtn = document.getElementById("send");
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    function textOf(ev) {
+      if (ev.type === "user_prompt" || ev.type === "agent_response" || ev.type === "error") return ev.text ?? "";
+      if (ev.type === "tool_call") return ev.tool + " " + JSON.stringify(ev.args ?? {});
+      if (ev.type === "tool_result") return ev.tool + "\n" + (typeof ev.result === "string" ? ev.result : JSON.stringify(ev.result));
+      if (ev.type === "tool_error") return ev.tool + ": " + (ev.error ?? "");
+      return JSON.stringify(ev);
+    }
+
+    function render(events) {
+      logEl.innerHTML = "";
+      for (const ev of events) {
+        const div = document.createElement("div");
+        div.className = "event " + ev.type;
+        div.innerHTML = '<div class="tag"></div><pre></pre>';
+        div.querySelector(".tag").textContent = ev.type + "  ·  " + (ev.ts ?? "");
+        div.querySelector("pre").textContent = textOf(ev);
+        logEl.appendChild(div);
+      }
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function refresh() {
+      if (!sessionId) return;
+      const r = await fetch("/api/history/" + encodeURIComponent(sessionId));
+      render(await r.json());
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = msgEl.value.trim();
+      if (!message) return;
+      msgEl.value = "";
+      sendBtn.disabled = true;
+      try {
+        await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, message }),
+        });
+      } catch (e) {
+        // Network error; the history refresh below still shows the recorded prompt.
+      } finally {
+        await refresh();
+        sendBtn.disabled = false;
+        msgEl.focus();
+      }
+    });
+
+    refresh();
+  </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.sever.agent
 
 import com.sever.config.AgentConfig
 import com.sever.config.AgentConfigLoader
+import com.sever.history.SessionHistory
 import com.sever.mcp.McpServers
 import com.sever.mcp.playwrightMcpServer
 import com.sever.skills.SkillTools
@@ -22,29 +23,20 @@ class Agent(
             val toolRegistry = mcpServers.connectAll() + CommandTools.registry() + SkillTools.registry(config.skillsDir)
             log.info("Tools available: {}", toolRegistry.tools.joinToString { it.name })
 
-            val agent = agentFactory.create(SystemPromptFactory.build(config), toolRegistry)
+            val history = SessionHistory("cli-${System.currentTimeMillis()}")
+            history.userPrompt(userPrompt)
+            val agent = agentFactory.create(SystemPromptFactory.build(config), toolRegistry, history)
 
             log.info("Running task: {}", userPrompt)
-            agent.run(userPrompt).also { log.info("Agent run completed") }
+            agent.run(userPrompt).also {
+                history.agentResponse(it)
+                log.info("Agent run completed")
+            }
         } catch (e: Throwable) {
-            report(e)
+            log.error(LlmErrors.userMessage(e), e)
             throw e
         } finally {
             mcpServers.closeAll()
         }
     }
-
-    private fun report(error: Throwable) {
-        if (isAuthError(error)) {
-            log.error("Anthropic API authentication failed — check ANTHROPIC_API_KEY", error)
-        } else {
-            log.error("Agent run failed", error)
-        }
-    }
-
-    private fun isAuthError(error: Throwable): Boolean =
-        generateSequence(error) { it.cause }.any { cause ->
-            val message = cause.message?.lowercase().orEmpty()
-            listOf("401", "unauthorized", "authentication", "x-api-key").any { it in message }
-        }
 }

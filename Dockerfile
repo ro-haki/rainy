@@ -68,4 +68,5 @@ WORKDIR /app
 COPY app/ ./
 COPY skills/ ./skills/
 
+EXPOSE 8080
 ENTRYPOINT ["./bin/rainy"]

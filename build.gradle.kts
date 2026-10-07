@@ -42,6 +42,8 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
     implementation("org.slf4j:slf4j-api:2.0.17")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.16")
+    implementation("io.ktor:ktor-server-core:3.3.3")
+    implementation("io.ktor:ktor-server-cio:3.3.3")
 }
 
 val imageName = "rainy-agent:${project.version}"
@@ -51,6 +53,9 @@ val promptCmd = providers.gradleProperty("prompt").map { listOf(it) }.orElse(emp
 
 // Host logs directory bind-mounted into the containers so per-run jsonl logs persist.
 val logsDir = project.file("logs").apply { mkdirs() }.absolutePath
+
+// Host skills directory — devRun mounts the dist over /app, which would hide the image's skills.
+val skillsDir = project.file("skills").absolutePath
 
 // .env values (API key, model) injected into the containers the docker tasks run.
 val dotenv: Map<String, String> = file(".env").takeIf { it.isFile }
@@ -85,6 +90,7 @@ val createContainer by tasks.registering(DockerCreateContainer::class) {
     cmd.set(promptCmd)
     envVars.set(dotenv)
     hostConfig.binds.set(mapOf(logsDir to "/app/logs"))
+    hostConfig.portBindings.set(listOf("8080:8080"))
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }
@@ -116,8 +122,10 @@ val devCreateContainer by tasks.registering(DockerCreateContainer::class) {
         mapOf(
             layout.buildDirectory.dir("install/rainy").get().asFile.absolutePath to "/app",
             logsDir to "/app/logs",
+            skillsDir to "/app/skills",
         ),
     )
+    hostConfig.portBindings.set(listOf("8080:8080"))
     hostConfig.capAdd.set(listOf("NET_RAW", "NET_ADMIN"))
     hostConfig.autoRemove.set(true)
 }

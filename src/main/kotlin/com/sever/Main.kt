@@ -1,17 +1,21 @@
 package com.sever
 
 import com.sever.agent.Agent
+import com.sever.server.startChatServer
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("com.sever.Main")
 
 fun main(args: Array<String>) {
-    val userPrompt = args.joinToString(" ").trim()
-    if (userPrompt.isEmpty()) {
-        log.error("No task prompt provided. Pass it as an argument, e.g. \"scan scanme.nmap.org\"")
+    val prompt = args.joinToString(" ").trim().ifEmpty { readStdinIfPresent() }
+    if (prompt.isNotEmpty()) {
+        log.info("Agent response:\n{}", Agent().run(prompt))
         return
     }
 
-    val response = Agent().run(userPrompt)
-    log.info("Agent response:\n{}", response)
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+    startChatServer(port)
 }
+
+private fun readStdinIfPresent(): String =
+    if (System.`in`.available() > 0) System.`in`.bufferedReader().readText().trim() else ""
